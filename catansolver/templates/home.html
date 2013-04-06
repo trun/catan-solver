@@ -93,16 +93,17 @@
                 radius: hexRadius / 3,
                 fill: 'white',
                 stroke: 'black',
-                strokeWidth: 4
+                strokeWidth: 2
             });
 
+            var numberColor = dots(tile.number) == 5 ? 'red' : 'black';
             var number = new Kinetic.Text({
                 x: hexX,
                 y: hexY,
                 text: tile.number,
                 fontSize: 24,
                 fontFamily: 'Helvetica',
-                fill: 'black'
+                fill: numberColor
             });
 
             number.setOffset({
@@ -123,8 +124,8 @@
                     x: (radius * 2 + 2) * i,
                     y: radius,
                     radius: radius,
-                    fill: 'black',
-                    stroke: 'black',
+                    fill: numberColor,
+                    stroke: numberColor,
                     strokeWidth: 1
                 });
                 dotsWidth = dot.getPosition().x + dot.getWidth();
