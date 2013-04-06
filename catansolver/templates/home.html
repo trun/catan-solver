@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Catan Solver</title>
+    <script src="http://code.jquery.com/jquery-1.9.1.min.js"></script>
+    <script src="http://d3lp1msu2r81bx.cloudfront.net/kjs/js/lib/kinetic-v4.4.0.min.js"></script>
+    <style>
+        html, body {
+            height: 100%;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+        }
+
+        #container {
+            width: 100%;
+            height: 100%;
+        }
+    </style>
+</head>
+<body>
+<div id="container"></div>
+<script>
+    var $container = $('#container');
+    var width = $container.width();
+    var height = $container.height();
+
+    var stage = new Kinetic.Stage({
+        container: 'container',
+        width: width,
+        height: height
+    });
+
+    var layer = new Kinetic.Layer();
+
+    var hexRadius = 70;
+    var hexHeight = hexRadius * 2;
+    var rowHeight = 1.5 * hexRadius;
+    var hexHalfWidth = Math.sqrt((hexRadius * hexRadius) - ((hexRadius / 2) * (hexRadius / 2)));
+    var hexWidth = hexHalfWidth * 2;
+
+    var initX = (width - hexWidth * 5) / 2;
+    var initY = (height - rowHeight * 5) / 2;
+
+    function drawHex(row, col, tile) {
+        var offsetX = (row % 2 == 0) ? 0 : hexHalfWidth;
+        var rowOffsetX = ((row == 0 || row == 4) ? hexWidth : 0) + offsetX;
+
+        var hexX = initX + rowOffsetX + (col * hexWidth);
+        var hexY = initY + (row * rowHeight);
+        var hexagon = new Kinetic.RegularPolygon({
+            x: hexX,
+            y: hexY,
+            sides: 6,
+            radius: hexRadius,
+            fill: tile.color,
+            stroke: 'black',
+            strokeWidth: 1
+        });
+
+        // add the shape to the layer
+        layer.add(hexagon);
+
+        if (tile.number) {
+            var circle = new Kinetic.Circle({
+                x: hexX,
+                y: hexY,
+                radius: hexRadius / 3,
+                fill: 'white',
+                stroke: 'black',
+                strokeWidth: 4
+            });
+
+            var number = new Kinetic.Text({
+                x: hexX,
+                y: hexY,
+                text: tile.number,
+                fontSize: 24,
+                fontFamily: 'Helvetica',
+                fill: 'black'
+            });
+
+            number.setOffset({
+                x: number.getWidth() / 2,
+                y: number.getHeight() / 2
+            });
+
+            layer.add(circle);
+            layer.add(number);
+        }
+    }
+
+    var tiles = [
+        'green', 'green', 'green', 'green',
+        'yellow', 'yellow', 'yellow', 'yellow',
+        'lightgreen', 'lightgreen', 'lightgreen', 'lightgreen',
+        'red', 'red', 'red',
+        'gray', 'gray', 'gray',
+        'white'
+    ];
+
+    var numbers = [ 5, 2, 6, 3, 8, 10, 9, 12, 11, 4, 8, 10, 9, 4, 5, 6, 3, 11 ];
+
+    var order = [
+        [ 4, 0 ],
+        [ 4, 1 ],
+        [ 4, 2 ],
+        [ 3, 3 ],
+        [ 2, 4 ],
+        [ 1, 3 ],
+        [ 0, 2 ],
+        [ 0, 1 ],
+        [ 0, 0 ],
+        [ 1, 0 ],
+        [ 2, 0 ],
+        [ 3, 0 ],
+        [ 3, 1 ],
+        [ 3, 2 ],
+        [ 2, 3 ],
+        [ 1, 2 ],
+        [ 1, 1 ],
+        [ 2, 1 ],
+        [ 2, 2 ]
+    ];
+
+    var board = [
+        [ {}, {}, {}],
+        [ {}, {}, {}, {} ],
+        [ {}, {}, {}, {}, {} ],
+        [ {}, {}, {}, {} ],
+        [ {}, {}, {} ]
+    ];
+
+    $.each(order, function(i, item) {
+        var row = item[0];
+        var col = item[1];
+        var tile = board[row][col];
+        tile.color = tiles.splice(Math.floor(Math.random() * tiles.length), 1)[0];
+        if (tile.color != 'white') {
+            tile.number = numbers.shift();
+        } else {
+            tile.number = 0;
+        }
+        drawHex(row, col, tile);
+    });
+
+    // add the layer to the stage
+    stage.add(layer);
+</script>
+</body>
+</html>
