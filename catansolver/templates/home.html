@@ -34,8 +34,6 @@
         height: height
     });
 
-    var layer = new Kinetic.Layer();
-
     var hexRadius = 70;
     var hexHeight = hexRadius * 2;
     var rowHeight = 1.5 * hexRadius;
@@ -45,7 +43,18 @@
     var initX = (width - hexWidth * 5) / 2;
     var initY = (height - rowHeight * 5) / 2;
 
-    function drawHex(row, col, tile) {
+    function drawBoard(board) {
+        stage.clear();
+        var layer = new Kinetic.Layer();
+        $.each(board, function(row, tiles) {
+            $.each(tiles, function(col, tile) {
+                drawHex(row, col, tile, layer);
+            });
+        });
+        stage.add(layer);
+    }
+
+    function drawHex(row, col, tile, layer) {
         var offsetX = (row % 2 == 0) ? 0 : hexHalfWidth;
         var rowOffsetX = ((row == 0 || row == 4) ? hexWidth : 0) + offsetX;
 
@@ -61,7 +70,6 @@
             strokeWidth: 1
         });
 
-        // add the shape to the layer
         layer.add(hexagon);
 
         if (tile.number) {
@@ -105,12 +113,11 @@
                     stroke: numberColor,
                     strokeWidth: 1
                 });
-                dotsWidth = dot.getPosition().x + dot.getWidth();
                 dotsGroup.add(dot);
             }
 
             dotsGroup.setOffset({
-                x: dotsWidth / 2 - 2,
+                x: dotsWidth / 2 - 3,
                 y: -10
             });
 
@@ -121,14 +128,7 @@
     }
 
     $.getJSON('/board.json').done(function(data) {
-        $.each(data, function(row, tiles) {
-            $.each(tiles, function(col, tile) {
-                drawHex(row, col, tile);
-            });
-        });
-
-        // add the layer to the stage
-        stage.add(layer);
+        drawBoard(data);
     });
 </script>
 </body>
